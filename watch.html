@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tonight · baby</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Outfit, system-ui, sans-serif; background: #1a0f2e; color: #efe6f8; }
+    header { text-align: center; padding: 2.6rem 1.25rem .6rem; color: #fff; }
+    h1 { font-family: "Playfair Display", serif; font-size: clamp(2rem, 5vw, 3rem); }
+    .sub { color: #d8c8ee; margin-top: .5rem; }
+    nav { display: flex; justify-content: center; gap: .6rem; flex-wrap: wrap; padding: 1rem 1rem 1.4rem; }
+    nav a { color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.25); padding: .55rem 1rem; border-radius: 999px; font-size: .9rem; }
+    nav a.active, nav a:hover { background: #6b3fa0; border-color: #6b3fa0; }
+    .wrap { max-width: 1100px; margin: 0 auto 3rem; padding: 0 1.1rem; }
+    .status {
+      text-align: center; color: #c9a7eb; font-size: .9rem; margin-bottom: 1rem;
+    }
+    .status b { color: #fff; }
+    .grid2 { display: grid; grid-template-columns: 1.2fr .9fr; gap: 1rem; }
+    @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+    .pane {
+      background: #2a1848;
+      border: 1px solid rgba(201,167,235,.3);
+      border-radius: 22px;
+      overflow: hidden;
+    }
+    .frame { aspect-ratio: 16/9; background: #000; }
+    .frame iframe, #yt { width: 100%; height: 100%; border: 0; display: block; }
+    .call { min-height: 320px; }
+    .call iframe { width: 100%; height: 100%; min-height: 360px; border: 0; }
+    .bar {
+      display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center;
+      padding: 1rem 0 1.4rem;
+    }
+    .bar a, .bar button {
+      background: #6b3fa0; color: #fff; border: 0; border-radius: 999px;
+      padding: .55rem 1rem; font: inherit; font-size: .88rem; text-decoration: none; cursor: pointer;
+    }
+    .bar a.ghost { background: transparent; border: 1px solid rgba(201,167,235,.45); }
+    .list { display: grid; gap: .5rem; }
+    button.song {
+      text-align: left; width: 100%;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(201,167,235,.2);
+      color: #fff; border-radius: 14px; padding: .8rem 1rem; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: inherit;
+    }
+    button.song:hover, button.song.on { background: #6b3fa0; border-color: #6b3fa0; }
+    .meta { font-size: .78rem; color: #d8c8ee; }
+    .note { max-width: 720px; margin: 0 auto 1.4rem; text-align: center; color: #d8c8ee; line-height: 1.65; }
+    .sig { font-family: "Playfair Display", serif; font-style: italic; color: #c9a7eb; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tonight</h1>
+    <p class="sub">same songs · same room · us</p>
+  </header>
+  <nav>
+    <a href="index.html">The card</a>
+    <a href="playlist.html">BTS playlist</a>
+    <a class="active" href="watch.html">Tonight</a>
+  </nav>
+  <div class="wrap">
+    <p class="note">
+      If we both keep this page open, the videos stay together.
+      The call is on the right. Or we take the same songs to
+      <a href="https://w2g.tv" target="_blank" rel="noopener" style="color:#e4c8ff">Watch2Gether</a>
+      like always.
+    </p>
+    <p class="status" id="status">finding our room…</p>
+    <div class="grid2">
+      <div class="pane">
+        <div class="frame"><div id="yt"></div></div>
+      </div>
+      <div class="pane call">
+        <iframe
+          allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write"
+          src="https://meet.jit.si/IPurpleYouBabyBorahae#config.prejoinPageEnabled=false&userInfo.displayName=%22baby%22"
+          title="our call"></iframe>
+      </div>
+    </div>
+    <div class="bar">
+      <a class="ghost" id="w2g" href="https://w2g.tv" target="_blank" rel="noopener">open Watch2Gether</a>
+      <a class="ghost" id="copyyt" href="#" target="_blank" rel="noopener">this song on YouTube</a>
+    </div>
+    <div class="list" id="list"></div>
+    <p class="note sig" style="margin-top:1.6rem">I’ll be there · I purple you</p>
+  </div>
+
+  <script src="songs.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    var ROOM = "baby-purple-borahae-room";
+    var player, ytReady = false, currentId = BTS_SONGS[0].id;
+    var conns = [];
+    var applying = false;
+
+    function setStatus(t) { document.getElementById("status").innerHTML = t; }
+
+    function highlight(id) {
+      document.querySelectorAll(".song").forEach(function (x) {
+        x.classList.toggle("on", x.dataset.id === id);
+      });
+      var s = BTS_SONGS.filter(function (x) { return x.id === id; })[0];
+      document.getElementById("copyyt").href = ytWatch(id);
+      if (s) document.title = s.t + " · tonight";
+    }
+
+    function send(msg) {
+      conns.forEach(function (c) {
+        if (c.open) c.send(msg);
+      });
+    }
+
+    function playId(id, auto, broadcast) {
+      currentId = id;
+      highlight(id);
+      if (ytReady) {
+        if (auto) player.loadVideoById(id);
+        else player.cueVideoById(id);
+      }
+      if (broadcast) send({ type: "video", id: id });
+    }
+
+    function onMsg(msg) {
+      if (!msg || !msg.type) return;
+      applying = true;
+      if (msg.type === "video") playId(msg.id, true, false);
+      if (msg.type === "state" && ytReady) {
+        if (Math.abs((player.getCurrentTime() || 0) - msg.t) > 2) {
+          player.seekTo(msg.t, true);
+        }
+        if (msg.p === 1) player.playVideo();
+        if (msg.p === 2) player.pauseVideo();
+      }
+      setTimeout(function () { applying = false; }, 400);
+    }
+
+    function hookConn(c) {
+      conns.push(c);
+      c.on("data", onMsg);
+      c.on("close", function () {
+        conns = conns.filter(function (x) { return x !== c; });
+        setStatus(conns.length ? "we’re both here 💜" : "waiting for you…");
+      });
+      setStatus("we’re both here 💜");
+      send({ type: "video", id: currentId });
+    }
+
+    function startNet() {
+      if (typeof Peer === "undefined") {
+        setStatus("play here — or meet me on Watch2Gether");
+        return;
+      }
+      var host = new Peer(ROOM);
+      host.on("open", function () {
+        setStatus("our room is open · waiting for you…");
+      });
+      host.on("connection", hookConn);
+      host.on("error", function (err) {
+        if (err.type !== "unavailable-id") {
+          setStatus("play here — or meet me on Watch2Gether");
+          return;
+        }
+        var guest = new Peer();
+        guest.on("open", function () {
+          var c = guest.connect(ROOM);
+          c.on("open", function () {
+            hookConn(c);
+          });
+        });
+        guest.on("error", function () {
+          setStatus("play here — or meet me on Watch2Gether");
+        });
+      });
+    }
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player("yt", {
+        videoId: currentId,
+        playerVars: { rel: 0, modestbranding: 1, playsinline: 1, origin: location.origin },
+        events: {
+          onReady: function () { ytReady = true; },
+          onStateChange: function (e) {
+            if (applying) return;
+            if (e.data === 1 || e.data === 2) {
+              send({ type: "state", p: e.data, t: player.getCurrentTime() || 0 });
+            }
+            if (e.data === 0) {
+              var i = BTS_SONGS.findIndex(function (s) { return s.id === currentId; });
+              var next = BTS_SONGS[(i + 1) % BTS_SONGS.length];
+              playId(next.id, true, true);
+            }
+          }
+        }
+      });
+    }
+
+    BTS_SONGS.forEach(function (s, i) {
+      var b = document.createElement("button");
+      b.className = "song" + (i === 0 ? " on" : "");
+      b.dataset.id = s.id;
+      b.innerHTML = "<span><strong>" + s.t + "</strong><br><span class='meta'>" + s.n + "</span></span><span class='meta'>play</span>";
+      b.onclick = function () { playId(s.id, true, true); };
+      document.getElementById("list").appendChild(b);
+    });
+    highlight(currentId);
+    startNet();
+  </script>
+</body>
+</html>

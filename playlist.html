@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Baby’s BTS Birthday Playlist 💜</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Outfit, system-ui, sans-serif; background: #1a0f2e; color: #fff; }
+    header { text-align: center; padding: 3rem 1.25rem 1rem; }
+    h1 { font-family: "Playfair Display", serif; font-size: clamp(2rem, 5vw, 3.2rem); }
+    .sub { color: #d8c8ee; margin-top: .6rem; }
+    nav { display: flex; justify-content: center; gap: .6rem; flex-wrap: wrap; padding: 1rem 1rem 2rem; }
+    nav a { color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.25); padding: .55rem 1rem; border-radius: 999px; font-size: .9rem; }
+    nav a.active, nav a:hover { background: #6b3fa0; border-color: #6b3fa0; }
+    .player { max-width: 860px; margin: 0 auto 1.5rem; padding: 0 1rem; }
+    .frame { border-radius: 18px; overflow: hidden; background: #000; aspect-ratio: 16/9; }
+    .frame iframe, #yt { width: 100%; height: 100%; border: 0; display: block; }
+    .now { text-align: center; color: #c9a7eb; margin: .8rem 0 1.5rem; font-size: .95rem; }
+    .grid { max-width: 860px; margin: 0 auto 4rem; padding: 0 1rem; display: grid; gap: .55rem; }
+    button.song {
+      text-align: left; width: 100%;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(201,167,235,.2);
+      color: #fff; border-radius: 14px; padding: .85rem 1rem; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+      font-family: inherit;
+    }
+    button.song:hover, button.song.on { background: #6b3fa0; border-color: #6b3fa0; }
+    .meta { font-size: .78rem; color: #d8c8ee; }
+    .tag { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: #c9a7eb; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Birthday BTS stack</h1>
+    <p class="sub">click a song — it plays here</p>
+  </header>
+  <nav>
+    <a href="index.html">The card</a>
+    <a class="active" href="playlist.html">BTS playlist</a>
+    <a href="watch.html">Tonight</a>
+  </nav>
+  <div class="player">
+    <div class="frame"><div id="yt"></div></div>
+    <p class="now" id="now">Permission to Dance</p>
+  </div>
+  <div class="grid" id="list"></div>
+  <script src="songs.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    var player, ready = false, pending = "CuklIb9d3fI";
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player("yt", {
+        videoId: pending,
+        playerVars: {
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          origin: location.origin
+        },
+        events: {
+          onReady: function () { ready = true; }
+        }
+      });
+    }
+
+    function playSong(s, auto) {
+      document.querySelectorAll(".song").forEach(function (x) { x.classList.remove("on"); });
+      var btn = document.querySelector('[data-id="' + s.id + '"]');
+      if (btn) btn.classList.add("on");
+      document.getElementById("now").textContent = s.t;
+      if (ready) {
+        if (auto) player.loadVideoById(s.id);
+        else player.cueVideoById(s.id);
+      } else {
+        pending = s.id;
+      }
+    }
+
+    BTS_SONGS.forEach(function (s, i) {
+      var b = document.createElement("button");
+      b.className = "song" + (i === 0 ? " on" : "");
+      b.dataset.id = s.id;
+      b.innerHTML = "<span><strong>" + s.t + "</strong><br><span class='meta'>" + s.n + "</span></span><span class='tag'>play</span>";
+      b.onclick = function () { playSong(s, true); };
+      document.getElementById("list").appendChild(b);
+    });
+  </script>
+</body>
+</html>

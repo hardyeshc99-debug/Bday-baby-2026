@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Happy Birthday, Baby 💜</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root { --purple: #6b3fa0; --lilac: #c9a7eb; --deep: #1a0f2e; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Outfit, system-ui, sans-serif;
+      background: var(--deep);
+      color: #fff;
+      min-height: 100vh;
+    }
+    .stars { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+    .stars span {
+      position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%;
+      animation: twinkle 3s infinite ease-in-out;
+    }
+    @keyframes twinkle { 50% { opacity: .2; } }
+    header { position: relative; z-index: 1; text-align: center; padding: 4rem 1.25rem 2rem; }
+    .badge {
+      display: inline-block; letter-spacing: .25em; text-transform: uppercase;
+      font-size: .72rem; color: var(--lilac); margin-bottom: 1rem;
+    }
+    h1 {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2.4rem, 7vw, 4.4rem);
+      line-height: 1.1;
+    }
+    h1 em { font-style: italic; color: var(--lilac); }
+    .sub { margin-top: 1rem; color: #d8c8ee; font-weight: 300; font-size: 1.1rem; }
+    nav {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center; gap: .6rem; flex-wrap: wrap;
+      padding: 0 1rem 2rem;
+    }
+    nav a {
+      color: #fff; text-decoration: none;
+      border: 1px solid rgba(255,255,255,.25);
+      padding: .55rem 1rem; border-radius: 999px; font-size: .9rem;
+    }
+    nav a:hover, nav a.active { background: var(--purple); border-color: var(--purple); }
+    .wrap { position: relative; z-index: 1; max-width: 920px; margin: 0 auto; padding: 0 1.25rem 5rem; }
+    .card {
+      background: linear-gradient(160deg, #2a1848, #3d2266 50%, #1f1238);
+      border: 1px solid rgba(201,167,235,.35);
+      border-radius: 28px;
+      padding: 2.4rem 2rem;
+      box-shadow: 0 30px 80px rgba(0,0,0,.4);
+    }
+    .card p { line-height: 1.75; color: #efe6f8; margin: 0 0 1rem; font-size: 1.05rem; }
+    .sig { font-family: "Playfair Display", serif; font-style: italic; font-size: 1.35rem; color: var(--lilac); margin-top: 1.5rem; }
+    .hearts { text-align: center; font-size: 1.4rem; margin-top: 1.5rem; letter-spacing: .4rem; }
+    footer { text-align: center; color: #9b86b8; padding-bottom: 2rem; font-size: .85rem; }
+  </style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  <header>
+    <div class="badge">just for you</div>
+    <h1>Happy birthday,<br><em>baby</em> 💜</h1>
+    <p class="sub">Borahae. Even from far away, I’m right here.</p>
+  </header>
+  <nav>
+    <a class="active" href="index.html">The card</a>
+    <a href="playlist.html">BTS playlist</a>
+    <a href="watch.html">Tonight</a>
+  </nav>
+  <div class="wrap">
+    <article class="card">
+      <p>Hey baby,</p>
+      <p>Wish you all the life — the best of yourself.</p>
+      <p>
+        All my wishes and heart and love, that you go your way,
+        improve in life, and gain happiness and prosperity.
+        All my wishes that you get more love than I give —
+        tenfold from mom, dad, sister, and the kids at home.
+        You are the heart, soul and mind of the family.
+      </p>
+      <p>
+        You’ll become more beautiful as the days pass,
+        and more brave, and happy, and healthy.
+      </p>
+      <p>
+        Your life will never keep anything bad — it will go away from your path.
+        You’ll get all the love from the world, and your heart will always stay
+        sweet, innocent, beautiful and courageous.
+      </p>
+      <p>
+        You’ll get whatever you wish. I ask destiny to give you what you want,
+        to guide you to that path, and I want to see you achieve it. Always.
+      </p>
+      <p class="sig">Always yours · I purple you</p>
+      <div class="hearts">💜 🎂 🎤 💜</div>
+    </article>
+  </div>
+  <footer>for baby</footer>
+  <script>
+    const s = document.getElementById("stars");
+    for (let i = 0; i < 70; i++) {
+      const el = document.createElement("span");
+      el.style.left = Math.random() * 100 + "%";
+      el.style.top = Math.random() * 100 + "%";
+      el.style.animationDelay = Math.random() * 3 + "s";
+      el.style.opacity = 0.3 + Math.random() * 0.7;
+      s.appendChild(el);
+    }
+  </script>
+</body>
+</html>
